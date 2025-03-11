@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clock</title>
+
+    <style>
+        :root {
+            --black: #262223;
+            --dark-green: #35402E;
+            --light-green: #E1F2BD;
+            --light-grey: #D1D9C1;
+            --brown-green: #CBD9AD;
+        }
+
+        .text-foreground { color: var(--light-green); }
+        .text-shadow { color: var(--dark-green); }
+        .text-background { color: var(--black); }
+        .bg-foreground { background-color: var(--brown-green); }
+        .bg-shadow { background-color: var(--dark-green); }
+        .bg-background { background-color: var(--black); }
+        .text-left { text-align: left; }
+
+        @font-face {
+            font-family: 'alarm clock';
+            src: url('assets/fonts/alarm clock.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Poppins';
+            src: url('assets/fonts/poppins.regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        .clock-font { font-family: 'alarm clock', sans-serif; }
+        .button-font {
+            font-family: 'Poppins', sans-serif;
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            width: 100vw;
+            min-height: 100svh;
+            box-sizing: border-box;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: start;
+            align-items: center;
+            padding: 2em;
+        }
+
+        main {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1em;
+        }
+
+        .clock-panel {
+            display: flex;
+            justify-content: start;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 2em;
+            box-sizing: border-box;
+            border-radius: 0.75em;
+            width: 100%;
+        }
+
+        .clock-face {
+            position: relative;
+            width: max-content;
+            font-size: 10em;
+        }
+
+        .clock-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .info-face {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: start;
+            align-items: end;
+            flex-grow: 1;
+            font-size: 3.6em;
+        }
+
+        .info-shadow {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            justify-content: start;
+            align-items: end;
+        }
+
+        .info-text {
+            position: absolute;
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            justify-content: start;
+            align-items: end;
+        }
+
+        .clock-buttons {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1em;
+        }
+
+        .clock-buttons>button {
+            width: 100%;
+            height: 2em;
+            border: none;
+            border-radius: 0.5em;
+            background-color: var(--black);
+            color: var(--light-green);
+            cursor: pointer;
+            font-size: 1.25em;
+            text-transform: uppercase;
+        }
+
+        .clock-buttons>button:hover {
+            background-color: var(--dark-green);
+        }
+    </style>
+</head>
+
+<body class="bg-foreground">
+    <main>
+        <div class="clock-panel bg-background clock-font text-foreground">
+            <div class="clock-face">
+                <div class="clock-shadow">
+                    <span class="text-shadow">88:88</span>
+                </div>
+
+                <div class="clock-text">
+                    <span id="clock-time">16:16</span>
+                </div>
+            </div>
+
+            <div class="info-face">
+                <div class="info-shadow">
+                    <span class="text-shadow">88°C</span>
+                    <span class="text-shadow">88 %</span>
+                </div>
+
+                <div class="info-text">
+                    <span id="temperature-text">32°C</span>
+                    <span id="moisture-text">69 %</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="clock-buttons">
+            <button type="button" id="hours-btn" class="button-font">Hours</button>
+            <button type="button" id="alarm-btn" class="button-font">Alarm</button>
+            <button type="button" id="minutes-btn" class="button-font">Minutes</button>
+        </div>
+    </main>
+</body>
+</html>
