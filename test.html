@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test</title>
-    <link rel="stylesheet" href="resources/style.css">
 </head>
 
 <body>
@@ -13,9 +12,8 @@
     <button id="led-off-btn">LED OFF</button>
 
     <script>
-        const ESP8266_01 = "192.168.0.100";
         async function fetchPin(pinControl) {
-            const response = await fetch(`http://192.168.0.100:80/?pin=${pinControl}`, { method: "GET" });
+            const response = await fetch(`http://192.168.0.102:80/?pin=${pinControl}`, { method: "GET" });
             let data = await response.json();
 
             if (!response.ok) {
@@ -26,12 +24,12 @@
             return data;
         }
 
-        document.getElementById("led-on-btn").addEventListener("click", () => {
-            fetchPin("121");
+        document.getElementById("led-on-btn").addEventListener("click", async () => {
+            await fetchPin("121");
         });
 
-        document.getElementById("led-off-btn").addEventListener("click", () => {
-            fetchPin("120");
+        document.getElementById("led-off-btn").addEventListener("click", async () => {
+            await fetchPin("120");
         });
     </script>
 </body>
