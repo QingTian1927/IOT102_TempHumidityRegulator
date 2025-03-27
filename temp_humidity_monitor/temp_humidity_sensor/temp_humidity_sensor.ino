@@ -50,8 +50,6 @@ void loop() {
     if (esp8266.find("+IPD,")) {
       delay(1000);
       int connectionId = esp8266.read() - '0';
-      Serial.println(connectionId);
-
       sendJSON(connectionId);
     }
   }

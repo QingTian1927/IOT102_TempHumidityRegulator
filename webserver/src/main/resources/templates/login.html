@@ -5,8 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Login</title>
     <style>
+        :root {
+            --black: #262223;
+            --dark-green: #35402E;
+            --light-green: #E1F2BD;
+            --light-grey: #D1D9C1;
+            --brown-green: #CBD9AD;
+        }
+
         body {
-            background-color: #d0dbb3;
+            background-color: var(--brown-green);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -16,7 +24,7 @@
         }
 
         .login-container {
-            background: #fff;
+            background: #ffffff;
             padding: 40px;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
@@ -30,9 +38,10 @@
         }
 
         .login-header {
-            background: #222;
-            color: #d0dbb3;
-            padding: 15px;
+            background: var(--black);
+            color: var(--light-green);
+            padding: 15px 0;
+            margin-bottom: 20px;
             font-size: 24px;
             font-weight: bold;
             width: 100%;
@@ -64,30 +73,13 @@
             height: 24px;
         }
 
-        .forgot-password {
-            font-size: 14px;
-            color: #6a6a6a;
-            text-align: right;
-            width: 100%;
-            margin-top: 5px;
-        }
-
-        .forgot-password a {
-            color: #4d4d4d;
-            text-decoration: none;
-        }
-
-        .forgot-password a:hover {
-            text-decoration: underline;
-        }
-
         .login-btn {
             width: 100%;
             padding: 14px;
-            background: #222;
-            color: white;
+            background: var(--black);
+            color: var(--light-green);
             border: none;
-            border-radius: 10px;
+            border-radius: 0 0 15px 15px;
             cursor: pointer;
             transition: transform 0.3s, background 0.3s;
             font-size: 18px;
@@ -97,7 +89,6 @@
 
         .login-btn:hover {
             background: #444;
-            transform: scale(1.05);
         }
     </style>
 </head>
