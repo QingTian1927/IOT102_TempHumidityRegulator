@@ -8,20 +8,43 @@
 
     <style>
         :root {
+            --white: #FFFFFF;
             --black: #262223;
+            --black-transparent: rgba(38, 34, 35, 0.5);
             --dark-green: #35402E;
+            --dark-green-transparent: rgba(53, 64, 46, 0.5);
             --light-green: #E1F2BD;
             --light-grey: #D1D9C1;
             --brown-green: #CBD9AD;
         }
 
-        .text-foreground { color: var(--light-green); }
-        .text-shadow { color: var(--dark-green); }
-        .text-background { color: var(--black); }
-        .bg-foreground { background-color: var(--brown-green); }
-        .bg-shadow { background-color: var(--dark-green); }
-        .bg-background { background-color: var(--black); }
-        .text-left { text-align: left; }
+        .text-foreground {
+            color: var(--light-green);
+        }
+
+        .text-shadow {
+            color: var(--dark-green);
+        }
+
+        .text-background {
+            color: var(--black);
+        }
+
+        .bg-foreground {
+            background-color: var(--brown-green);
+        }
+
+        .bg-shadow {
+            background-color: var(--dark-green);
+        }
+
+        .bg-background {
+            background-color: var(--black);
+        }
+
+        .text-left {
+            text-align: left;
+        }
 
         @font-face {
             font-family: 'alarm clock';
@@ -37,8 +60,11 @@
             font-style: normal;
         }
 
-        .clock-font { font-family: 'alarm clock', sans-serif; }
-        .button-font {
+        .clock-font {
+            font-family: 'alarm clock', sans-serif;
+        }
+
+        .sans-serif {
             font-family: 'Poppins', sans-serif;
             font-weight: normal;
             font-style: normal;
@@ -67,6 +93,37 @@
             display: flex;
             flex-direction: column;
             gap: 1em;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        #settings-button {
+            height: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: 0.5em;
+            border: none;
+            padding: 0.75em;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s, background 0.3s;
+            background-color: var(--black);
+        }
+
+        #settings-button > svg {
+            height: 1.75em;
+            aspect-ratio: 1 / 1;
+            filter: invert(97%) sepia(9%) saturate(501%) hue-rotate(22deg) brightness(90%) contrast(88%);
+        }
+
+        #settings-button:hover {
+            background-color: var(--dark-green);
         }
 
         .clock-panel {
@@ -128,9 +185,10 @@
             gap: 1em;
         }
 
-        .clock-buttons>button {
+        .clock-buttons > button {
             width: 100%;
             height: 2em;
+            padding: 0.25em;
             border: none;
             border-radius: 0.5em;
             background-color: var(--black);
@@ -138,45 +196,305 @@
             cursor: pointer;
             font-size: 1.25em;
             text-transform: uppercase;
+            transition: transform 0.3s, background 0.3s;
         }
 
-        .clock-buttons>button:hover {
+        .clock-buttons > button:hover {
             background-color: var(--dark-green);
+        }
+
+        #settings-overlay {
+            position: fixed;
+            z-index: 10;
+            top: 0;
+            left: 0;
+            background-color: var(--dark-green-transparent);
+            width: 100%;
+            height: 100%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #settings-overlay > div {
+            width: 50%;
+            height: max-content;
+            border-radius: 0.75em;
+            background-color: var(--white);
+            padding: 2em;
+            display: flex;
+            flex-direction: column;
+            gap: 2em;
+        }
+
+        .settings-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2em;
+        }
+
+        .settings-header h2 {
+            width: fit-content;
+            font-weight: bold;
+            font-size: xx-large;
+        }
+
+        #settings-overlay .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5em;
+        }
+
+        #settings-overlay .input-group > label {
+            font-size: larger;
+        }
+
+        #settings-overlay .input-group > input {
+            border: none;
+            border-radius: 0.5em;
+            padding: 0.75em;
+            font-size: large;
+            color: var(--black);
+            background-color: var(--brown-green);
+        }
+
+        #settings-close-button {
+            aspect-ratio: 1 / 1;
+            border-radius: 0.5em;
+            border: none;
+            padding: 0.75em;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s, background 0.3s;
+            background-color: var(--brown-green);
+        }
+
+        #settings-close-button > svg {
+            height: 1.75em;
+            aspect-ratio: 1 / 1;
+            filter: invert(9%) sepia(8%) saturate(754%) hue-rotate(295deg) brightness(87%) contrast(86%);
+        }
+
+        #settings-close-button:hover {
+            background-color: var(--light-green);
+        }
+
+        .save-button-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: end;
+            flex-grow: 1;
+        }
+
+        #settings-save-button {
+            width: 6em;
+            border-radius: 0.5em;
+            border: none;
+            padding: 0.5em;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s, background 0.3s;
+            background-color: var(--brown-green);
+            font-size: large;
+        }
+
+        #settings-save-button:hover {
+            background-color: var(--light-green);
         }
     </style>
 </head>
 
 <body class="bg-foreground">
-    <main>
-        <div class="clock-panel bg-background clock-font text-foreground">
-            <div class="clock-face">
-                <div class="clock-shadow">
-                    <span class="text-shadow">88:88</span>
-                </div>
+<main>
+    <div class="header">
+        <h1 class="sans-serif">ArduClimate</h1>
+        <button id="settings-button">
+            <svg xmlns="http://www.w3.org/2000/svg" class="bi bi-gear"
+                 viewBox="0 0 16 16">
+                <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
+                <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
+            </svg>
+        </button>
+    </div>
 
-                <div class="clock-text">
-                    <span id="clock-time">16:16</span>
-                </div>
+    <div class="clock-panel bg-background clock-font text-foreground">
+        <div class="clock-face">
+            <div class="clock-shadow">
+                <span class="text-shadow">88:88</span>
             </div>
 
-            <div class="info-face">
-                <div class="info-shadow">
-                    <span class="text-shadow">88°C</span>
-                    <span class="text-shadow">88 %</span>
-                </div>
-
-                <div class="info-text">
-                    <span id="temperature-text">32°C</span>
-                    <span id="moisture-text">69 %</span>
-                </div>
+            <div class="clock-text">
+                <span id="clock-time">16:16</span>
             </div>
         </div>
 
-        <div class="clock-buttons">
-            <button type="button" id="hours-btn" class="button-font">Hours</button>
-            <button type="button" id="alarm-btn" class="button-font">Alarm</button>
-            <button type="button" id="minutes-btn" class="button-font">Minutes</button>
+        <div class="info-face">
+            <div class="info-shadow">
+                <span class="text-shadow">88°8</span>
+                <span class="text-shadow">88 %</span>
+            </div>
+
+            <div class="info-text">
+                <span id="temperature-text">88°C</span>
+                <span id="humidity-text">88 %</span>
+            </div>
         </div>
-    </main>
+    </div>
+
+    <div class="clock-buttons">
+        <button type="button" id="hours-btn" class="sans-serif">Hours</button>
+        <button type="button" id="alarm-btn" class="sans-serif">Alarm</button>
+        <button type="button" id="minutes-btn" class="sans-serif">Minutes</button>
+    </div>
+</main>
+
+<div id="settings-overlay">
+    <div class="sans-serif">
+        <header class="settings-header">
+            <h2>Settings</h2>
+            <button id="settings-close-button" type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" class="bi bi-x-lg"
+                     viewBox="0 0 16 16">
+                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                </svg>
+            </button>
+        </header>
+
+        <div class="input-group">
+            <label for="ip">ESP8266-01 IP Address</label>
+            <input type="text" id="ip">
+        </div>
+
+        <div class="save-button-container">
+            <button id="settings-save-button" class="sans-serif">
+                Save
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let espIP = "192.168.0.100";
+
+    function openOverlay(overlay) {
+        overlay.style.display = "flex";
+    }
+
+    function closeOverlay(overlay) {
+        overlay.style.display = "none";
+    }
+
+    const settingsOverlay = document.getElementById("settings-overlay");
+    const settingsButton = document.getElementById("settings-button");
+    const settingsCloseButton = document.getElementById("settings-close-button");
+    const settingsSaveButton = document.getElementById("settings-save-button");
+
+    settingsButton.addEventListener("click", () => {
+        openOverlay(settingsOverlay);
+    });
+
+    settingsCloseButton.addEventListener("click", () => {
+        closeOverlay(settingsOverlay);
+    });
+
+    settingsSaveButton.addEventListener("click", () => {
+        const ipInput = document.getElementById("ip");
+        if (ip.value !== "") {
+            espIP = ip;
+        }
+
+        closeOverlay(settingsOverlay);
+    })
+
+    const clockText = document.getElementById("clock-time");
+    const temperatureText = document.getElementById("temperature-text");
+    const humidity = document.getElementById("humidity-text");
+
+    function updateClock() {
+        const time = new Date();
+        const hours = String(time.getHours()).padStart(2, "0");
+        const minutes = String(time.getMinutes()).padStart(2, "0");
+        clockText.innerText = `${hours}:${minutes}`;
+    }
+
+    function syncClock() {
+        updateClock();
+        const now = new Date();
+        const delay = (60 - now.getSeconds()) * 1000;
+        setTimeout(() => {
+            updateClock();
+            setInterval(updateClock, 60000);
+        }, delay);
+    }
+
+    syncClock();
+
+    async function postReading(data) {
+        const postUrl = "http://your-api-endpoint.com/data";
+
+        try {
+            const response = await fetch(postUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                console.log("Successfully posted data.");
+            } else {
+                console.error(`Failed to post data. Status: ${response.status}`);
+            }
+        } catch (error) {
+            console.error("Error posting data:", error);
+        }
+    }
+
+    async function delay(ms) {
+        return await new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+
+
+    async function fetchReading() {
+        const url = `http://${espIP}:80/`
+        const response = await fetch(url, {method: "GET"});
+        const data = await response.json();
+
+        if (response.ok) {
+            console.log(data);
+            temperatureText.innerText = `${data.temperature}°C`;
+            humidity.innerText = `${data.humidity} %`;
+            return data;
+        } else {
+            console.error(`HTTP error! Status: ${response.status}`);
+            return null
+        }
+    }
+
+    async function fetchReadingOnInterval() {
+        try {
+            while (true) {
+                await fetchReading();
+                await delay(1000 * 60);
+            }
+        } catch (err) {
+            console.error(`Encountered an error while fetching reading: ${err}`)
+        }
+    }
+
+    window.addEventListener("load", async () => {
+        await fetchReading();
+        await fetchReadingOnInterval();
+    })
+</script>
 </body>
 </html>
