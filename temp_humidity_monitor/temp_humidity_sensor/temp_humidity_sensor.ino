@@ -38,10 +38,9 @@ void setup() {
 
 void loop() {
   int result;
+
   if (millis() - lastReadTime >= 1000) {  // Ensure at least 1s between reads
     lastReadTime = millis();
-
-    Serial.println(result);
     result = dht11.readTemperatureHumidity(temperature, humidity);
     dht11Error = (result == 0) ? "" : DHT11::getErrorString(result);
   }
@@ -124,9 +123,12 @@ void sendJSON(int connectionId) {
   // Serial.println(sendCmd);
   // Serial.println(closeCmd);
 
-  if (sendCommand(sendCmd, 2000).indexOf(">") != 1) {
+  String sendResult = sendCommand(sendCmd, 2000);
+  delay(500);
+
+  if (sendResult.indexOf(">") != 1) {
     esp8266.println(httpResponse);
-    delay(1000);
+    delay(2000);
   }
   sendCommand(closeCmd, 1000);
   delay(500);
