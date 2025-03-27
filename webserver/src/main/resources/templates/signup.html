@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Login</title>
+    <title>Sign up</title>
     <style>
         :root {
             --black: #262223;
@@ -93,8 +93,8 @@
     </style>
 </head>
 <body>
-<form action="login" method="POST" class="login-container">
-    <div class="login-header">User Login</div>
+<form action="save" method="POST" class="login-container">
+    <div class="login-header">Sign up</div>
     <div class="input-group">
         <img class="icon" src="/user-solid.svg" alt="User Icon">
         <input type="email" id="username" name="username" placeholder="Enter your email">
@@ -103,8 +103,12 @@
         <img class="icon" src="/key-solid.svg" alt="Lock Icon">
         <input type="password" id="password" name="password" placeholder="Enter your password">
     </div>
+    <div class="input-group">
+        <img class="icon" src="/key-solid.svg" alt="Lock Icon">
+        <input type="password" id="repeated_password" name="repeated_password" placeholder="Repeat your password">
+    </div>
     <p style="color:#9c0614; margin: 0;" th:if="${error != null}" th:text="${error}"></p>
-    <button class="login-btn">Login</button>
+    <button class="login-btn">Sign up</button>
 </form>
 </body>
 </html>
