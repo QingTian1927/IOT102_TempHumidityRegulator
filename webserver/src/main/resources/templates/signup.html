@@ -93,7 +93,7 @@
     </style>
 </head>
 <body>
-<form action="save" method="POST" class="login-container">
+<form id="signup-form" action="save" method="POST" class="login-container">
     <div class="login-header">Sign up</div>
     <div class="input-group">
         <img class="icon" src="/user-solid.svg" alt="User Icon">
@@ -105,10 +105,25 @@
     </div>
     <div class="input-group">
         <img class="icon" src="/key-solid.svg" alt="Lock Icon">
-        <input type="password" id="repeated_password" name="repeated_password" placeholder="Repeat your password">
+        <input type="password" id="repeat-password" name="repeat-password" placeholder="Repeat your password">
     </div>
     <p style="color:#9c0614; margin: 0;" th:if="${error != null}" th:text="${error}"></p>
-    <button class="login-btn">Sign up</button>
+    <button type="submit" class="login-btn">Sign up</button>
+
+    <script th:inline="javascript">
+        const passwordInput = document.getElementById("password");
+        const repeatPasswordInput = document.getElementById("repeat-password");
+        const signupForm = document.getElementById("signup-form");
+
+        signupForm.querySelector("button").addEventListener("click", (e) => {
+            e.preventDefault();
+
+            if (passwordInput.value !== repeatPasswordInput.value) {
+                alert("Repeat password does not match password");
+            }
+            signupForm.submit();
+        })
+    </script>
 </form>
 </body>
 </html>
