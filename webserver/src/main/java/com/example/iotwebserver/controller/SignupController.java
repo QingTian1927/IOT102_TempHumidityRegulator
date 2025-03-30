@@ -1,12 +1,10 @@
 package com.example.iotwebserver.controller;
 
-import com.example.iotwebserver.model.User;
 import com.example.iotwebserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -21,8 +19,8 @@ public class SignupController {
     }
 
     @PostMapping(value = {"/save"})
-    public String save(@RequestParam String username, @RequestParam String password, @RequestParam String repeated_password, Model model) {
-        if(!password.equals(repeated_password)) {
+    public String save(@RequestParam String username, @RequestParam String password, @RequestParam("repeat-password") String repeatPassword, Model model) {
+        if(!password.equals(repeatPassword)) {
             model.addAttribute("error", "Passwords do not match!");
             return "signup";
         } else if (userService.registerUser(username, password)) {
