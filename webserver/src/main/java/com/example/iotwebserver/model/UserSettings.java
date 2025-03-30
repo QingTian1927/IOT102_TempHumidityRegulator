@@ -7,6 +7,11 @@ import java.util.UUID;
 @Entity
 @Table(name = "user_settings")
 public class UserSettings {
+    public static final int TEMPERATURE_HARD_UPPER_BOUND = 50;
+    public static final int TEMPERATURE_HARD_LOWER_BOUND = 0;
+    public static final int HUMIDITY_HARD_UPPER_BOUND = 80;
+    public static final int HUMIDITY_HARD_LOWER_BOUND = 20;
+
     @Id
     @Column(name = "user_id")
     private UUID id;
@@ -19,16 +24,16 @@ public class UserSettings {
     private String espIP;
 
     @Column(name = "temp_upper_bound")
-    private int temperatureUpperBound;
+    private int temperatureUpperBound = TEMPERATURE_HARD_UPPER_BOUND;
 
     @Column(name = "temp_lower_bound")
-    private int temperatureLowerBound;
+    private int temperatureLowerBound = TEMPERATURE_HARD_LOWER_BOUND;
 
     @Column(name = "humidity_upper_bound")
-    private int humidityUpperBound;
+    private int humidityUpperBound = HUMIDITY_HARD_UPPER_BOUND;
 
     @Column(name = "humidity_lower_bound")
-    private int humidityLowerBound;
+    private int humidityLowerBound = HUMIDITY_HARD_LOWER_BOUND;
 
     public UserSettings() {
     }
