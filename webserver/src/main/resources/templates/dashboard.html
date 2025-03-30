@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -157,11 +156,22 @@
         .info-face {
             position: relative;
             display: flex;
-            flex-direction: column;
-            justify-content: start;
-            align-items: end;
+            justify-content: end;
             flex-grow: 1;
             font-size: 3.6em;
+            gap: 0.5em;
+        }
+
+        .warning-shadow svg {
+            aspect-ratio: 1 / 1;
+        }
+
+        .warning-off {
+            filter: invert(19%) sepia(12%) saturate(1009%) hue-rotate(53deg) brightness(101%) contrast(87%);
+        }
+
+        .warning-on {
+            filter: invert(92%) sepia(14%) saturate(603%) hue-rotate(32deg) brightness(105%) contrast(90%);
         }
 
         .info-shadow {
@@ -231,7 +241,7 @@
             align-items: center;
         }
 
-        #settings-overlay > div {
+        #settings-overlay > form {
             width: 50%;
             height: max-content;
             border-radius: 0.75em;
@@ -262,17 +272,27 @@
             gap: 0.5em;
         }
 
+        #settings-overlay .input-group > div {
+            width: 100%;
+            display: flex;
+            gap: 0.5em;
+        }
+
         #settings-overlay .input-group > label {
             font-size: larger;
         }
 
-        #settings-overlay .input-group > input {
+        #settings-overlay .input-group > input, .input-group > div > input {
             border: none;
             border-radius: 0.5em;
             padding: 0.75em;
             font-size: large;
             color: var(--black);
             background-color: var(--brown-green);
+        }
+
+        #settings-overlay .input-group > div > input {
+            width: 50%;
         }
 
         #settings-close-button {
@@ -358,6 +378,20 @@
         </div>
 
         <div class="info-face">
+            <div class="warning-shadow">
+                <svg id="temperature-warning" xmlns="http://www.w3.org/2000/svg"
+                     class="bi bi-exclamation-triangle warning-off" viewBox="0 0 16 16">
+                    <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.15.15 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.2.2 0 0 1-.054.06.1.1 0 0 1-.066.017H1.146a.1.1 0 0 1-.066-.017.2.2 0 0 1-.054-.06.18.18 0 0 1 .002-.183L7.884 2.073a.15.15 0 0 1 .054-.057m1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767z"/>
+                    <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+                </svg>
+
+                <svg id="humidity-warning" xmlns="http://www.w3.org/2000/svg"
+                     class="bi bi-exclamation-triangle warning-off" viewBox="0 0 16 16">
+                    <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.15.15 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.2.2 0 0 1-.054.06.1.1 0 0 1-.066.017H1.146a.1.1 0 0 1-.066-.017.2.2 0 0 1-.054-.06.18.18 0 0 1 .002-.183L7.884 2.073a.15.15 0 0 1 .054-.057m1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767z"/>
+                    <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+                </svg>
+            </div>
+
             <div class="info-shadow">
                 <span class="text-shadow">88°8</span>
                 <span class="text-shadow">88 %</span>
@@ -408,7 +442,7 @@
 </main>
 
 <div id="settings-overlay">
-    <div class="sans-serif">
+    <form th:action="@{/settings}" method="POST" id="settings-form" class="sans-serif">
         <header class="settings-header">
             <h2>Settings</h2>
             <button id="settings-close-button" type="button">
@@ -420,132 +454,244 @@
         </header>
 
         <div class="input-group">
-            <label for="ip">ESP8266-01 IP Address</label>
-            <input type="text" id="ip">
+            <label for="espIp">ESP8266-01 IP Address</label>
+            <input type="text" id="espIp" th:value="${settings.getEspIP()}" required>
+        </div>
+
+        <div class="input-group">
+            <label for="temperature-bounds">Allowed Temperature Bounds</label>
+            <div id="temperature-bounds">
+                <input type="number" id="temperatureLowerBound" th:value="${settings.getTemperatureLowerBound()}"
+                       required
+                       th:min="${settings.TEMPERATURE_HARD_LOWER_BOUND}"
+                       th:max="${settings.TEMPERATURE_HARD_UPPER_BOUND}">
+                <input type="number" id="temperatureUpperBound" th:value="${settings.getTemperatureUpperBound()}"
+                       required
+                       th:min="${settings.TEMPERATURE_HARD_LOWER_BOUND}"
+                       th:max="${settings.TEMPERATURE_HARD_UPPER_BOUND}">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="temperature-bounds">Allowed Humidity Bounds</label>
+            <div id="humidity-bounds">
+                <input type="number" id="humidityLowerBound" th:value="${settings.getHumidityLowerBound()}" required
+                       th:min="${settings.HUMIDITY_HARD_LOWER_BOUND}" th:max="${settings.HUMIDITY_HARD_UPPER_BOUND}">
+                <input type="number" id="humidityUpperBound" th:value="${settings.getHumidityUpperBound()}" required
+                       th:min="${settings.HUMIDITY_HARD_LOWER_BOUND}" th:max="${settings.HUMIDITY_HARD_UPPER_BOUND}">
+            </div>
         </div>
 
         <div class="save-button-container">
-            <button id="settings-save-button" class="sans-serif">
+            <button type="submit" id="settings-save-button" class="sans-serif">
                 Save
             </button>
         </div>
-    </div>
+    </form>
 </div>
 
-<script>
-    let espIP = "192.168.0.100";
+<th:block th:with="apiUrl = @{/api/upload}">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const espIP = [[${espIP}]];
 
-    function openOverlay(overlay) {
-        overlay.style.display = "flex";
-    }
-
-    function closeOverlay(overlay) {
-        overlay.style.display = "none";
-    }
-
-    const settingsOverlay = document.getElementById("settings-overlay");
-    const settingsButton = document.getElementById("settings-button");
-    const settingsCloseButton = document.getElementById("settings-close-button");
-    const settingsSaveButton = document.getElementById("settings-save-button");
-
-    settingsButton.addEventListener("click", () => {
-        openOverlay(settingsOverlay);
-    });
-
-    settingsCloseButton.addEventListener("click", () => {
-        closeOverlay(settingsOverlay);
-    });
-
-    settingsSaveButton.addEventListener("click", () => {
-        const ipInput = document.getElementById("ip");
-        if (ip.value !== "") {
-            espIP = ip;
+        function openOverlay(overlay) {
+            overlay.style.display = "flex";
         }
 
-        closeOverlay(settingsOverlay);
-    })
+        function closeOverlay(overlay) {
+            overlay.style.display = "none";
+        }
 
-    const clockText = document.getElementById("clock-time");
-    const temperatureText = document.getElementById("temperature-text");
-    const humidity = document.getElementById("humidity-text");
+        const settingsOverlay = document.getElementById("settings-overlay");
+        const settingsButton = document.getElementById("settings-button");
+        const settingsCloseButton = document.getElementById("settings-close-button");
+        const settingsSaveButton = document.getElementById("settings-save-button");
 
-    function updateClock() {
-        const time = new Date();
-        const hours = String(time.getHours()).padStart(2, "0");
-        const minutes = String(time.getMinutes()).padStart(2, "0");
-        clockText.innerText = `${hours}:${minutes}`;
-    }
+        settingsButton.addEventListener("click", () => {
+            openOverlay(settingsOverlay);
+        });
 
-    function syncClock() {
-        updateClock();
-        const now = new Date();
-        const delay = (60 - now.getSeconds()) * 1000;
-        setTimeout(() => {
-            updateClock();
-            setInterval(updateClock, 60000);
-        }, delay);
-    }
+        settingsCloseButton.addEventListener("click", () => {
+            closeOverlay(settingsOverlay);
+        });
 
-    syncClock();
+        settingsSaveButton.addEventListener("click", (e) => {
+            e.preventDefault();
 
-    async function postReading(data) {
-        const postUrl = "http://your-api-endpoint.com/data";
+            const settingsForm = document.getElementById("settings-form");
+            const temperatureLowerBound = document.getElementById("temperatureLowerBound");
+            const temperatureUpperBound = document.getElementById("temperatureUpperBound");
+            const humidityLowerBound = document.getElementById("humidityLowerBound");
+            const humidityUpperBound = document.getElementById("humidityUpperBound");
 
-        try {
-            const response = await fetch(postUrl, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
-            });
+            if (temperatureUpperBound.value < temperatureLowerBound.value) {
+                alert("Temperature upper bound cannot be smaller than lower bound");
+                return;
+            }
 
-            if (response.ok) {
-                console.log("Successfully posted data.");
+            if (humidityUpperBound.value < humidityLowerBound.value) {
+                alert("Humidity upper bound cannot be smaller than lower bound");
+                return;
+            }
+
+            settingsForm.submit();
+        })
+
+        function turnOnWarning(warningSign) {
+            warningSign.classList.remove("warning-off");
+            warningSign.classList.add("warning-on");
+        }
+
+        function turnOffWarning(warningSign) {
+            warningSign.classList.add("warning-off");
+            warningSign.classList.remove("warning-on");
+        }
+
+        function blinkWarning(warningSign) {
+            if (warningSign.classList.contains("warning-off")) {
+                turnOnWarning(warningSign);
             } else {
-                console.error(`Failed to post data. Status: ${response.status}`);
+                turnOffWarning(warningSign);
             }
-        } catch (error) {
-            console.error("Error posting data:", error);
         }
-    }
 
-    async function delay(ms) {
-        return await new Promise(resolve => setTimeout(resolve, ms));
-    }
+        const clockText = document.getElementById("clock-time");
+        const temperatureText = document.getElementById("temperature-text");
+        const humidity = document.getElementById("humidity-text");
 
-
-    async function fetchReading() {
-        const url = `http://${espIP}:80/`
-        const response = await fetch(url, {method: "GET"});
-        const data = await response.json();
-
-        if (response.ok) {
-            console.log(data);
-            temperatureText.innerText = `${data.temperature}°C`;
-            humidity.innerText = `${data.humidity} %`;
-            return data;
-        } else {
-            console.error(`HTTP error! Status: ${response.status}`);
-            return null
+        function updateClock() {
+            const time = new Date();
+            const hours = String(time.getHours()).padStart(2, "0");
+            const minutes = String(time.getMinutes()).padStart(2, "0");
+            clockText.innerText = `${hours}:${minutes}`;
         }
-    }
 
-    async function fetchReadingOnInterval() {
-        try {
-            while (true) {
-                await fetchReading();
-                await delay(1000 * 60);
+        function syncClock() {
+            updateClock();
+            const now = new Date();
+            const delay = (60 - now.getSeconds()) * 1000;
+            setTimeout(() => {
+                updateClock();
+                setInterval(updateClock, 60000);
+            }, delay);
+        }
+
+        syncClock();
+
+        async function postReading(data) {
+            const postUrl = [[${apiUrl}]];
+
+            try {
+                const response = await fetch(postUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    console.log("Successfully posted data.");
+                } else {
+                    console.error(`Failed to post data. Status: ${response.status}`);
+                }
+            } catch (error) {
+                console.error("Error posting data:", error);
             }
-        } catch (err) {
-            console.error(`Encountered an error while fetching reading: ${err}`)
         }
-    }
 
-    window.addEventListener("load", async () => {
-        await fetchReading();
-        await fetchReadingOnInterval();
-    })
-</script>
+        async function delay(ms) {
+            return await new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+
+        async function fetchReading() {
+            const temperatureWarning = document.getElementById("temperature-warning");
+            const humidityWarning = document.getElementById("humidity-warning");
+
+            if (espIP === null) {
+                alert("ESP8266-01 IP Address has not been set up yet!");
+                return;
+            }
+
+            const url = `http://${espIP}:80/`
+            try {
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        "Connection": "close"
+                    }
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    console.log(data);
+                    temperatureText.innerText = `${data.temperature}°C`;
+                    humidity.innerText = `${data.humidity} %`;
+
+                    if (data.status === "ok") {
+                        await postReading(data);
+                    }
+
+                    return data;
+                } else if (!response.ok || data.status === "error") {
+                    console.error(`HTTP error! Status: ${response.status}`);
+                    let flashCount = 4;
+                    const flashInterval = setInterval(() => {
+                        blinkWarning(temperatureWarning);
+                        blinkWarning(humidityWarning);
+                        flashCount--;
+
+                        if (flashCount <= 0) {
+                            clearInterval(flashInterval);
+                        }
+                    }, 200);
+                    return null
+                }
+            } catch (err) {
+                console.error("Fetch failed:", err);
+                let flashCount = 4;
+                const flashInterval = setInterval(() => {
+                    blinkWarning(temperatureWarning);
+                    blinkWarning(humidityWarning);
+                    flashCount--;
+
+                    if (flashCount <= 0) {
+                        clearInterval(flashInterval);
+                    }
+                }, 200);
+                return null;
+            }
+        }
+
+        async function fetchReadingOnInterval() {
+            try {
+                while (true) {
+                    const data = await fetchReading();
+                    await delay(1000 * 60);
+                }
+            } catch (err) {
+                console.error(`Encountered an error while fetching reading: ${err}`)
+            }
+        }
+
+        window.addEventListener("load", async () => {
+            if (espIP !== null) {
+                await fetchReadingOnInterval();
+                return;
+            }
+            alert("ESP8266-01 IP Address has not been set up yet!");
+        });
+
+        /*
+        setInterval(() => {
+            blinkWarning(document.getElementById("temperature-warning"))
+        }, 1500);
+         */
+
+        /*]]>*/
+    </script>
+</th:block>
 </body>
 </html>
