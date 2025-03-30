@@ -10,7 +10,7 @@ import java.util.Date;
 public class Reading {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(name = "temperature", nullable = false)
     private int temperature;
