@@ -22,7 +22,7 @@ public class LoginController {
     @PostMapping(value = {"/login"})
     public String processLogin(@RequestParam String username, @RequestParam String password, HttpSession session, Model model) {
         if (userService.checkLogin(username, password)) {
-            session.setAttribute("user", username);
+            session.setAttribute("username", username);
             return "redirect:/dashboard";
         } else {
             model.addAttribute("error", "Invalid username or password!");

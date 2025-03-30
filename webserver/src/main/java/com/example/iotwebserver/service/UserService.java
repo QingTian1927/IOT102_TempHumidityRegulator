@@ -18,6 +18,10 @@ public class UserService {
         this.userSettingsService = userSettingsService;
     }
 
+    public Optional<User> findByUsername(String username) {
+        return this.userRepository.findByUsername(username);
+    }
+
     public boolean checkLogin(String username, String password) {
         Optional<User> user = userRepository.findByUsername(username);
         return user.isPresent() && user.get().getPassword().equals(password);
@@ -28,12 +32,14 @@ public class UserService {
         if (userRepository.findByUsername(username).isPresent()) {
             return false; // Người dùng đã tồn tại
         }
-        User user = new User();
-        user.setUsername(username);
-        user.setPassword(password);
-        userRepository.save(user);
+        User user = new User(username, password);
+        user = userRepository.save(user);
+
+        System.out.println(user);
 
         UserSettings userSettings = new UserSettings(user);
+        System.out.println(userSettings);
+
         userSettingsService.save(userSettings);
         return true;
     }
