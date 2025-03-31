@@ -1,15 +1,13 @@
 package com.example.iotwebserver.model.dto;
 
-import jakarta.persistence.Column;
-
 public class UserSettingsForm {
     private String espIp;
-    private int temperatureUpperBound;
-    private int temperatureLowerBound;
-    private int humidityUpperBound;
-    private int humidityLowerBound;
+    private Integer temperatureUpperBound;
+    private Integer temperatureLowerBound;
+    private Integer humidityUpperBound;
+    private Integer humidityLowerBound;
 
-    public UserSettingsForm(String espIp, int temperatureUpperBound, int temperatureLowerBound, int humidityUpperBound, int humidityLowerBound) {
+    public UserSettingsForm(String espIp, Integer temperatureUpperBound, Integer temperatureLowerBound, Integer humidityUpperBound, Integer humidityLowerBound) {
         this.espIp = espIp;
         this.temperatureUpperBound = temperatureUpperBound;
         this.temperatureLowerBound = temperatureLowerBound;
@@ -25,35 +23,35 @@ public class UserSettingsForm {
         this.espIp = espIp;
     }
 
-    public int getTemperatureUpperBound() {
+    public Integer getTemperatureUpperBound() {
         return temperatureUpperBound;
     }
 
-    public void setTemperatureUpperBound(int temperatureUpperBound) {
+    public void setTemperatureUpperBound(Integer temperatureUpperBound) {
         this.temperatureUpperBound = temperatureUpperBound;
     }
 
-    public int getTemperatureLowerBound() {
+    public Integer getTemperatureLowerBound() {
         return temperatureLowerBound;
     }
 
-    public void setTemperatureLowerBound(int temperatureLowerBound) {
+    public void setTemperatureLowerBound(Integer temperatureLowerBound) {
         this.temperatureLowerBound = temperatureLowerBound;
     }
 
-    public int getHumidityUpperBound() {
+    public Integer getHumidityUpperBound() {
         return humidityUpperBound;
     }
 
-    public void setHumidityUpperBound(int humidityUpperBound) {
+    public void setHumidityUpperBound(Integer humidityUpperBound) {
         this.humidityUpperBound = humidityUpperBound;
     }
 
-    public int getHumidityLowerBound() {
+    public Integer getHumidityLowerBound() {
         return humidityLowerBound;
     }
 
-    public void setHumidityLowerBound(int humidityLowerBound) {
+    public void setHumidityLowerBound(Integer humidityLowerBound) {
         this.humidityLowerBound = humidityLowerBound;
     }
 
