@@ -461,11 +461,13 @@
         <div class="input-group">
             <label for="temperature-bounds">Allowed Temperature Bounds</label>
             <div id="temperature-bounds">
-                <input type="number" id="temperatureLowerBound" name="temperatureLowerBound" th:value="${settings.getTemperatureLowerBound()}"
+                <input type="number" id="temperatureLowerBound" name="temperatureLowerBound"
+                       th:value="${settings.getTemperatureLowerBound()}"
                        required
                        th:min="${settings.TEMPERATURE_HARD_LOWER_BOUND}"
                        th:max="${settings.TEMPERATURE_HARD_UPPER_BOUND}">
-                <input type="number" id="temperatureUpperBound" name="temperatureUpperBound" th:value="${settings.getTemperatureUpperBound()}"
+                <input type="number" id="temperatureUpperBound" name="temperatureUpperBound"
+                       th:value="${settings.getTemperatureUpperBound()}"
                        required
                        th:min="${settings.TEMPERATURE_HARD_LOWER_BOUND}"
                        th:max="${settings.TEMPERATURE_HARD_UPPER_BOUND}">
@@ -475,9 +477,11 @@
         <div class="input-group">
             <label for="temperature-bounds">Allowed Humidity Bounds</label>
             <div id="humidity-bounds">
-                <input type="number" id="humidityLowerBound" name="humidityLowerBound" th:value="${settings.getHumidityLowerBound()}" required
+                <input type="number" id="humidityLowerBound" name="humidityLowerBound"
+                       th:value="${settings.getHumidityLowerBound()}" required
                        th:min="${settings.HUMIDITY_HARD_LOWER_BOUND}" th:max="${settings.HUMIDITY_HARD_UPPER_BOUND}">
-                <input type="number" id="humidityUpperBound" name="humidityUpperBound" th:value="${settings.getHumidityUpperBound()}" required
+                <input type="number" id="humidityUpperBound" name="humidityUpperBound"
+                       th:value="${settings.getHumidityUpperBound()}" required
                        th:min="${settings.HUMIDITY_HARD_LOWER_BOUND}" th:max="${settings.HUMIDITY_HARD_UPPER_BOUND}">
             </div>
         </div>
@@ -516,14 +520,58 @@
             closeOverlay(settingsOverlay);
         });
 
-        settingsSaveButton.addEventListener("click", (e) => {
-            e.preventDefault();
+        const temperatureLowerBound = document.getElementById("temperatureLowerBound");
+        const temperatureUpperBound = document.getElementById("temperatureUpperBound");
+        const humidityLowerBound = document.getElementById("humidityLowerBound");
+        const humidityUpperBound = document.getElementById("humidityUpperBound");
 
+        async function updateBounds() {
+            if (espIP === null) {
+                alert("ESP8266-01 IP Address has not been set up yet!");
+                return;
+            }
+
+            let params = [];
+            if (temperatureLowerBound.value !== "" && !isNaN(temperatureLowerBound.value)) {
+                params.push(temperatureLowerBound.value);
+            }
+            if (temperatureUpperBound.value !== "" && !isNaN(temperatureUpperBound.value)) {
+                params.push(temperatureUpperBound.value);
+            }
+            if (humidityLowerBound.value !== "" && !isNaN(humidityLowerBound.value)) {
+                params.push(humidityLowerBound.value);
+            }
+            if (humidityUpperBound.value !== "" && !isNaN(humidityUpperBound.value)) {
+                params.push(humidityUpperBound.value);
+            }
+
+            let url = `http://${espIP}:80/?bounds=${params.join(",")}`;
+            console.log(url);
+            try {
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        "Connection": "close"
+                    }
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    console.log(data);
+                    return data;
+                } else {
+                    console.error("Fetch error:", response);
+                    return null;
+                }
+            } catch (err) {
+                console.error("Fetch failed:", err);
+                return null;
+            }
+        }
+
+        settingsSaveButton.addEventListener("click", async (e) => {
+            e.preventDefault();
             const settingsForm = document.getElementById("settings-form");
-            const temperatureLowerBound = document.getElementById("temperatureLowerBound");
-            const temperatureUpperBound = document.getElementById("temperatureUpperBound");
-            const humidityLowerBound = document.getElementById("humidityLowerBound");
-            const humidityUpperBound = document.getElementById("humidityUpperBound");
 
             if (temperatureUpperBound.value < temperatureLowerBound.value) {
                 alert("Temperature upper bound cannot be smaller than lower bound");
@@ -535,6 +583,11 @@
                 return;
             }
 
+            const data = await updateBounds();
+            if (data === null || data.status === "error") {
+                alert("Failed to update temperature and humidity allowed bounds");
+                return;
+            }
             settingsForm.submit();
         })
 
@@ -604,7 +657,6 @@
         async function delay(ms) {
             return await new Promise(resolve => setTimeout(resolve, ms));
         }
-
 
         async function fetchReading() {
             const temperatureWarning = document.getElementById("temperature-warning");
@@ -681,8 +733,12 @@
                 await fetchReadingOnInterval();
                 return;
             }
-            setInterval(() => { blinkWarning(document.getElementById("temperature-warning")) }, 500);
-            setInterval(() => { blinkWarning(document.getElementById("humidity-warning")) }, 500);
+            setInterval(() => {
+                blinkWarning(document.getElementById("temperature-warning"))
+            }, 500);
+            setInterval(() => {
+                blinkWarning(document.getElementById("humidity-warning"))
+            }, 500);
             alert("ESP8266-01 IP Address has not been set up yet!");
         });
 

@@ -16,6 +16,16 @@
 #define MODE_TEMPERATURE 1
 #define MODE_HUMIDITY 2
 
+#define TEMP_HARD_LOWER_BOUND 0
+#define TEMP_HARD_UPPER_BOUND 50
+#define HUMD_HARD_LOWER_BOUND 20
+#define HUMD_HARD_UPPER_BOUND 80
+
+#define EEPROM_TEMP_LOWER 0
+#define EEPROM_TEMP_UPPER 1
+#define EEPROM_HUMD_LOWER 2
+#define EEPROM_HUMD_UPPER 3
+
 #define COLON 0b01000000
 #define LEADING_ZEROS true
 #define NO_LEADING_ZEROS false
@@ -29,10 +39,10 @@
 #define JSON_STATUS_ERROR "error"
 #define JSON_STATUS_OUTBOUND "outbound"
 
-const String WIFI_SSID = "TP-Link_69420";
-const String WIFI_PASS = "WifiTPLINK1250@";
-//const String WIFI_SSID = "NoteX";
-//const String WIFI_PASS = "LmaoUrGay1257@";
+//const String WIFI_SSID = "TP-Link_69420";
+//const String WIFI_PASS = "WifiTPLINK1250@";
+const String WIFI_SSID = "NoteX";
+const String WIFI_PASS = "LmaoUrGay1257@";
 String IP = "";
 
 int mode = 0;   // default mode
@@ -57,10 +67,10 @@ int showTemp = true;
 String dht11Error = "";
 unsigned long lastReadTime = 0;
 
-int tempUpperBound = 90;
-int tempLowerBound = 80;
-int humidUpperBound = 90;
-int humidLowerBound = 80;
+int tempUpperBound;
+int tempLowerBound;
+int humidUpperBound;
+int humidLowerBound;
 
 const long BEEP_INTERVAL = 500;
 bool buzzerState = false;
@@ -116,6 +126,15 @@ void setup() {
 }
 
 void loop() {
+  Serial.print(tempLowerBound);
+  Serial.print(" ");
+  Serial.print(tempUpperBound);
+  Serial.print(" ");
+  Serial.print(humidLowerBound);
+  Serial.print(" ");
+  Serial.println(humidUpperBound);
+  getBound();
+
   int buttonState = digitalRead(BUTTON_MODE);
   if (buttonState == LOW) {
     isModeButtonPressed = true;
@@ -174,8 +193,81 @@ void loop() {
       }
 
       int connectionId = c - '0';
-      sendJSON(connectionId);
+
+      if (esp8266.find("bounds=")) {
+        delay(100);
+        int index = 0;
+        String value = "";
+
+        while (esp8266.available()) {
+          char c = esp8266.read();
+          Serial.println(c);
+
+          if (c == ' ') { break; }
+
+          if (c == ',') {
+            setBound(value, index++);
+            value = "";
+            continue;
+          }
+
+          if (c >= '0' && c <= '9') {
+            value += c;
+          }
+        }
+      } else {
+        sendJSON(connectionId);
+      }
     }
+  }
+}
+
+void getBound() {
+  tempLowerBound = EEPROM.read(EEPROM_TEMP_LOWER);
+  if (tempLowerBound == 255) {  // uninitialized memory
+    tempLowerBound = TEMP_HARD_LOWER_BOUND;
+    EEPROM.write(EEPROM_TEMP_LOWER, tempLowerBound);
+  }
+
+  tempUpperBound = EEPROM.read(EEPROM_TEMP_UPPER);
+  if (tempUpperBound == 255) {
+    tempUpperBound = TEMP_HARD_UPPER_BOUND;
+    EEPROM.write(EEPROM_TEMP_UPPER, tempUpperBound);
+  }
+
+  humidLowerBound = EEPROM.read(EEPROM_HUMD_LOWER);
+  if (humidLowerBound == 255) {
+    humidLowerBound = HUMD_HARD_LOWER_BOUND;
+    EEPROM.write(EEPROM_HUMD_LOWER, HUMD_HARD_LOWER_BOUND);
+  }
+
+  humidUpperBound = EEPROM.read(EEPROM_HUMD_UPPER);
+  if (humidUpperBound == 255) {
+    humidUpperBound = HUMD_HARD_UPPER_BOUND;
+    EEPROM.write(EEPROM_HUMD_UPPER, HUMD_HARD_UPPER_BOUND);
+  }
+}
+
+void setBound(String valueStr, int index) {
+  int valueNum = valueStr.toInt();
+
+  switch (index) {
+    case EEPROM_TEMP_LOWER:
+      tempLowerBound = valueNum;
+      EEPROM.write(EEPROM_TEMP_LOWER, tempLowerBound);
+      return;
+    case EEPROM_TEMP_UPPER:
+      tempUpperBound = valueNum;
+      EEPROM.write(EEPROM_TEMP_UPPER, tempUpperBound);
+      return;
+    case 2:
+      humidLowerBound = valueNum;
+      EEPROM.write(EEPROM_HUMD_LOWER, humidLowerBound);
+      return;
+    case 3:
+      humidUpperBound = valueNum;
+      EEPROM.write(EEPROM_HUMD_UPPER, humidUpperBound);
+      return;
   }
 }
 
