@@ -145,6 +145,7 @@ void loop() {
   }
   mode = count % 3;
 
+  
   int buzzerValue = digitalRead(BUTTON_BUZZ);
   if (buzzerValue == LOW) {
     isBuzzButtonPressed = true;
@@ -166,9 +167,9 @@ void loop() {
   bool tempOutOfBounds = (temperature < tempLowerBound || temperature > tempUpperBound);
   bool humidOutOfBounds = (humidity < humidLowerBound || humidity > humidUpperBound);
 
-  if (isOn && (tempOutOfBounds || humidOutOfBounds)) {
-    playMelody();
-  }
+  // if (isOn && (tempOutOfBounds || humidOutOfBounds)) {
+  //   playMelody();
+  // }
 
   switch (mode) {
     case MODE_INTERCHANGE:
@@ -189,9 +190,8 @@ void loop() {
 
       if (c < '0' || c > '9') {
         c = esp8266.read();
-        Serial.println((int)c);
+        Serial.println((int) c);
       }
-
       int connectionId = c - '0';
 
       if (esp8266.find("bounds=")) {
@@ -272,11 +272,21 @@ void setBound(String valueStr, int index) {
 }
 
 void displayTemperature() {
+  bool tempOutOfBounds = (temperature < tempLowerBound || temperature > tempUpperBound);
+ 
+  if (isOn && (tempOutOfBounds)) {
+    playMelody();
+  }
   display.showNumberDec(temperature, NO_LEADING_ZEROS, SHOW_TWO_DIGITS, ALIGN_LEFT);
   display.setSegments(SEG_TEMP, SECOND_DIGIT, 2);
 }
 
 void displayHumidity() {
+  bool humidOutOfBounds = (humidity < humidLowerBound || humidity > humidUpperBound);
+
+  if (isOn && (humidOutOfBounds)) {
+    playMelody();
+  }
   display.showNumberDec(humidity, NO_LEADING_ZEROS, SHOW_TWO_DIGITS, ALIGN_LEFT);
   display.setSegments(SEG_HUMID, FIRST_DIGIT, 3);
 }
