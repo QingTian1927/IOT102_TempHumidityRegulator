@@ -97,11 +97,11 @@
     <div class="login-header">User Login</div>
     <div class="input-group">
         <img class="icon" src="/user-solid.svg" alt="User Icon">
-        <input type="email" id="username" name="username" placeholder="Enter your email">
+        <input type="email" id="username" name="username" placeholder="Enter your email" required>
     </div>
     <div class="input-group">
         <img class="icon" src="/key-solid.svg" alt="Lock Icon">
-        <input type="password" id="password" name="password" placeholder="Enter your password">
+        <input type="password" id="password" name="password" placeholder="Enter your password" required>
     </div>
     <p style="color:#9c0614; margin: 0;" th:if="${error != null}" th:text="${error}"></p>
     <button class="login-btn">Login</button>
