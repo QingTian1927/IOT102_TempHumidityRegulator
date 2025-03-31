@@ -26,6 +26,26 @@ public class DashboardController {
         this.userSettingsService = userSettingsService;
     }
 
+    @GetMapping("/")
+    public String index() {
+        return "redirect:/dashboard";
+    }
+
+    @GetMapping(value = {"/dashboard"})
+    public String dashboard(Model model, HttpSession session) {
+        String username = (String) session.getAttribute("username");
+        Optional<User> user = userService.findByUsername(username);
+
+        if (user.isEmpty()) {
+            return "redirect:/login";
+        }
+
+        Optional<UserSettings> userSettings = userSettingsService.getUserSettings(user.get());
+        userSettings.ifPresent(settings -> model.addAttribute("settings", settings));
+
+        return "dashboard";
+    }
+
     @PostMapping("/settings")
     public String saveSettings(@ModelAttribute UserSettingsForm params, HttpSession session) {
         System.out.println(params);
@@ -60,20 +80,5 @@ public class DashboardController {
 
         this.userSettingsService.save(userSettings.get());
         return "redirect:/dashboard";
-    }
-
-    @GetMapping(value = {"/dashboard"})
-    public String dashboard(Model model, HttpSession session) {
-        String username = (String) session.getAttribute("username");
-        Optional<User> user = userService.findByUsername(username);
-
-        if (user.isEmpty()) {
-            return "redirect:/login";
-        }
-
-        Optional<UserSettings> userSettings = userSettingsService.getUserSettings(user.get());
-        userSettings.ifPresent(settings -> model.addAttribute("settings", settings));
-
-        return "dashboard";
     }
 }
