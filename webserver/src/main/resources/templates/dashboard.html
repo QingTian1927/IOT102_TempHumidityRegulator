@@ -398,8 +398,8 @@
             </div>
 
             <div class="info-text">
-                <span id="temperature-text">88°C</span>
-                <span id="humidity-text">88 %</span>
+                <span id="temperature-text">--°C</span>
+                <span id="humidity-text">-- %</span>
             </div>
         </div>
     </div>
@@ -455,17 +455,17 @@
 
         <div class="input-group">
             <label for="espIp">ESP8266-01 IP Address</label>
-            <input type="text" id="espIp" th:value="${settings.getEspIP()}" required>
+            <input type="text" id="espIp" name="espIp" th:value="${settings.getEspIP()}" required>
         </div>
 
         <div class="input-group">
             <label for="temperature-bounds">Allowed Temperature Bounds</label>
             <div id="temperature-bounds">
-                <input type="number" id="temperatureLowerBound" th:value="${settings.getTemperatureLowerBound()}"
+                <input type="number" id="temperatureLowerBound" name="temperatureLowerBound" th:value="${settings.getTemperatureLowerBound()}"
                        required
                        th:min="${settings.TEMPERATURE_HARD_LOWER_BOUND}"
                        th:max="${settings.TEMPERATURE_HARD_UPPER_BOUND}">
-                <input type="number" id="temperatureUpperBound" th:value="${settings.getTemperatureUpperBound()}"
+                <input type="number" id="temperatureUpperBound" name="temperatureUpperBound" th:value="${settings.getTemperatureUpperBound()}"
                        required
                        th:min="${settings.TEMPERATURE_HARD_LOWER_BOUND}"
                        th:max="${settings.TEMPERATURE_HARD_UPPER_BOUND}">
@@ -475,9 +475,9 @@
         <div class="input-group">
             <label for="temperature-bounds">Allowed Humidity Bounds</label>
             <div id="humidity-bounds">
-                <input type="number" id="humidityLowerBound" th:value="${settings.getHumidityLowerBound()}" required
+                <input type="number" id="humidityLowerBound" name="humidityLowerBound" th:value="${settings.getHumidityLowerBound()}" required
                        th:min="${settings.HUMIDITY_HARD_LOWER_BOUND}" th:max="${settings.HUMIDITY_HARD_UPPER_BOUND}">
-                <input type="number" id="humidityUpperBound" th:value="${settings.getHumidityUpperBound()}" required
+                <input type="number" id="humidityUpperBound" name="humidityUpperBound" th:value="${settings.getHumidityUpperBound()}" required
                        th:min="${settings.HUMIDITY_HARD_LOWER_BOUND}" th:max="${settings.HUMIDITY_HARD_UPPER_BOUND}">
             </div>
         </div>
@@ -490,7 +490,7 @@
     </form>
 </div>
 
-<th:block th:with="apiUrl = @{/api/upload}">
+<th:block th:with="apiUrl = @{/api/upload}, espIP = ${settings.getEspIP()}">
     <script th:inline="javascript">
         /*<![CDATA[*/
         const espIP = [[${espIP}]];
@@ -681,6 +681,8 @@
                 await fetchReadingOnInterval();
                 return;
             }
+            setInterval(() => { blinkWarning(document.getElementById("temperature-warning")) }, 500);
+            setInterval(() => { blinkWarning(document.getElementById("humidity-warning")) }, 500);
             alert("ESP8266-01 IP Address has not been set up yet!");
         });
 

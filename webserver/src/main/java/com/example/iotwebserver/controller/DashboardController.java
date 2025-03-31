@@ -2,6 +2,7 @@ package com.example.iotwebserver.controller;
 
 import com.example.iotwebserver.model.User;
 import com.example.iotwebserver.model.UserSettings;
+import com.example.iotwebserver.model.dto.UserSettingsForm;
 import com.example.iotwebserver.service.UserService;
 import com.example.iotwebserver.service.UserSettingsService;
 import jakarta.servlet.http.HttpSession;
@@ -26,7 +27,38 @@ public class DashboardController {
     }
 
     @PostMapping("/settings")
-    public String saveSettings(@ModelAttribute("userSettings") UserSettings userSettings) {
+    public String saveSettings(@ModelAttribute UserSettingsForm params, HttpSession session) {
+        System.out.println(params);
+
+        String username = (String) session.getAttribute("username");
+        Optional<User> user = userService.findByUsername(username);
+
+        if (user.isEmpty()) {
+            return "redirect:/login";
+        }
+
+        Optional<UserSettings> userSettings = userSettingsService.getUserSettings(user.get());
+        if (userSettings.isEmpty()) {
+            userSettings = Optional.of(this.userSettingsService.save(new UserSettings(user.get())));
+        }
+
+        if (params.getEspIp() != null) {
+            userSettings.get().setEspIP(params.getEspIp());
+        }
+        if (params.getHumidityLowerBound() != null) {
+            userSettings.get().setHumidityLowerBound(params.getHumidityLowerBound());
+        }
+        if (params.getHumidityUpperBound() != null) {
+            userSettings.get().setHumidityUpperBound(params.getHumidityUpperBound());
+        }
+        if (params.getTemperatureLowerBound() != null) {
+            userSettings.get().setTemperatureLowerBound(params.getTemperatureLowerBound());
+        }
+        if (params.getTemperatureUpperBound() != null) {
+            userSettings.get().setTemperatureUpperBound(params.getTemperatureUpperBound());
+        }
+
+        this.userSettingsService.save(userSettings.get());
         return "redirect:/dashboard";
     }
 
