@@ -948,9 +948,13 @@
 
                     if (data.temperature < temperatureLowerBound.value || data.temperature > temperatureUpperBound.value) {
                         turnOnWarning(temperatureWarning);
+                    } else {
+                        turnOffWarning(temperatureWarning);
                     }
                     if (data.humidity < humidityLowerBound.value || data.humidity > humidityUpperBound.value) {
-                        turnOnWarning(temperatureWarning);
+                        turnOnWarning(humidityWarning);
+                    } else {
+                        turnOffWarning(humidityWarning);
                     }
 
                     if (data.status === "ok") {
@@ -1053,6 +1057,8 @@
 
         async function switchArduinoMode(mode) {
             const url = `http://${espIP}:80/?mode=${mode}`;
+            console.log(url);
+
             try {
                 const response = await fetch(url, {
                     method: "GET",

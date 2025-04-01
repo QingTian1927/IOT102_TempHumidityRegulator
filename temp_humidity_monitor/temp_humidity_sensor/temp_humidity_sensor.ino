@@ -40,10 +40,12 @@
 #define JSON_STATUS_ERROR "error"
 #define JSON_STATUS_OUTBOUND "outbound"
 
-//const String WIFI_SSID = "TP-Link_69420";
-//const String WIFI_PASS = "WifiTPLINK1250@";
-const String WIFI_SSID = "NoteX";
-const String WIFI_PASS = "LmaoUrGay1257@";
+const String WIFI_SSID = "TP-Link_69420";
+const String WIFI_PASS = "WifiTPLINK1250@";
+//const String WIFI_SSID = "NoteX";
+//const String WIFI_PASS = "LmaoUrGay1257@";
+//const String WIFI_SSID = "WIFI_NIGA";
+//const String WIFI_PASS = "linhnga123";
 String IP = "";
 
 int mode = 0;   // default mode
@@ -179,6 +181,7 @@ void loop() {
 
   if (esp8266.available()) {
     if (esp8266.find("+IPD,")) {
+      delay(500);
       char c = esp8266.read();
       Serial.println((int)c);
 
@@ -189,6 +192,7 @@ void loop() {
       int connectionId = c - '0';
 
       String response = esp8266.readStringUntil('H');  // Read string until the H in HTTP/1.1
+      esp8266.flush();
       Serial.println(response);
 
       if (response.indexOf("bounds=") != -1) {
@@ -202,7 +206,7 @@ void loop() {
           char c = params.charAt(i);
           Serial.println(value);
 
-          if (c == ','  || c == ' ') {
+          if (c == ',' || c == ' ') {
             setBound(value, index++);
             value = "";
             continue;
@@ -230,6 +234,9 @@ void loop() {
           int modeValue = c - '0';
           if (modeValue >= 0 && modeValue <= 2) {
             count = modeValue;
+            Serial.print("Count: ");
+            Serial.println(count);
+
             sendStatusJSON(connectionId, "ok");
           } else {
             sendStatusJSON(connectionId, "error");
@@ -240,6 +247,8 @@ void loop() {
       } else {
         sendReadingJSON(connectionId);
       }
+
+      esp8266.flush();
     }
   }
 }
@@ -303,7 +312,8 @@ void setBound(String valueStr, int index) {
 
 void displayTemperature() {
   bool tempOutOfBounds = (temperature < tempLowerBound || temperature > tempUpperBound);
-
+  display.showNumberDec(temperature, NO_LEADING_ZEROS, SHOW_TWO_DIGITS, ALIGN_LEFT);
+  display.setSegments(SEG_TEMP, SECOND_DIGIT, 2);
   if ((tempOutOfBounds)) {
     digitalWrite(WARNING_LED, HIGH);
     if (isOn) {
@@ -312,13 +322,12 @@ void displayTemperature() {
   } else {
     digitalWrite(WARNING_LED, LOW);
   }
-  display.showNumberDec(temperature, NO_LEADING_ZEROS, SHOW_TWO_DIGITS, ALIGN_LEFT);
-  display.setSegments(SEG_TEMP, SECOND_DIGIT, 2);
 }
 
 void displayHumidity() {
   bool humidOutOfBounds = (humidity < humidLowerBound || humidity > humidUpperBound);
-
+  display.showNumberDec(humidity, NO_LEADING_ZEROS, SHOW_TWO_DIGITS, ALIGN_LEFT);
+  display.setSegments(SEG_HUMID, FIRST_DIGIT, 3);
   if ((humidOutOfBounds)) {
     digitalWrite(WARNING_LED, HIGH);
     if (isOn) {
@@ -327,8 +336,6 @@ void displayHumidity() {
   } else {
     digitalWrite(WARNING_LED, LOW);
   }
-  display.showNumberDec(humidity, NO_LEADING_ZEROS, SHOW_TWO_DIGITS, ALIGN_LEFT);
-  display.setSegments(SEG_HUMID, FIRST_DIGIT, 3);
 }
 
 void displayInterchange() {
@@ -388,7 +395,7 @@ void sendStatusJSON(int connectionId, String status) {
   digitalWrite(LED_BUILTIN, HIGH);
 
   String json;
-  json.reserve(25);
+  json.reserve(30);
 
   json = "{\"status\":\"";
   json += status;
@@ -407,6 +414,7 @@ void sendStatusJSON(int connectionId, String status) {
   httpResponse += String(json.length());
   httpResponse += "\r\n\r\n";
   httpResponse += json;
+  httpResponse += "\r\n";
 
   int contentLength = httpResponse.length();
   String sendCmd = "AT+CIPSEND=";
@@ -419,7 +427,7 @@ void sendStatusJSON(int connectionId, String status) {
   closeCmd += String(connectionId);
   closeCmd += "\r\n";
 
-  String sendResult = sendCommand(sendCmd, 2000);
+  String sendResult = sendCommand(sendCmd, 1000);
   delay(500);
 
   if (sendResult.indexOf(">") != 1) {
@@ -470,6 +478,7 @@ void sendReadingJSON(int connectionId) {
   httpResponse += String(json.length());
   httpResponse += "\r\n\r\n";
   httpResponse += json;
+  httpResponse += "\r\n";
 
   int contentLength = httpResponse.length();
   String sendCmd = "AT+CIPSEND=";
@@ -486,11 +495,11 @@ void sendReadingJSON(int connectionId) {
   // Serial.println(sendCmd);
   // Serial.println(closeCmd);
 
-  String sendResult = sendCommand(sendCmd, 2000);
+  String sendResult = sendCommand(sendCmd, 1000);
   delay(500);
 
   if (sendResult.indexOf(">") != 1) {
-    esp8266.println(httpResponse);
+    esp8266.print(httpResponse);
     delay(2000);
   }
 
