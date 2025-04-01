@@ -11,6 +11,7 @@
 #define CLK 7
 #define DHT 8
 #define BUZ 9
+#define WARNING_LED 10
 
 #define MODE_INTERCHANGE 0
 #define MODE_TEMPERATURE 1
@@ -121,18 +122,12 @@ void setup() {
   pinMode(BUTTON_MODE, INPUT_PULLUP);
   pinMode(BUZ, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(WARNING_LED, OUTPUT);
 
   digitalWrite(LED_BUILTIN, LOW);
 }
 
 void loop() {
-  Serial.print(tempLowerBound);
-  Serial.print(" ");
-  Serial.print(tempUpperBound);
-  Serial.print(" ");
-  Serial.print(humidLowerBound);
-  Serial.print(" ");
-  Serial.println(humidUpperBound);
   getBound();
 
   int buttonState = digitalRead(BUTTON_MODE);
@@ -145,7 +140,6 @@ void loop() {
   }
   mode = count % 3;
 
-  
   int buzzerValue = digitalRead(BUTTON_BUZZ);
   if (buzzerValue == LOW) {
     isBuzzButtonPressed = true;
@@ -190,20 +184,26 @@ void loop() {
 
       if (c < '0' || c > '9') {
         c = esp8266.read();
-        Serial.println((int) c);
+        Serial.println((int)c);
       }
       int connectionId = c - '0';
 
-      if (esp8266.find("bounds=")) {
-        delay(100);
+      String response = esp8266.readStringUntil('H');  // Read string until the H in HTTP/1.1
+      Serial.println(response);
+
+      if (response.indexOf("bounds=") != -1) {
         int index = 0;
         String value = "";
 
-        while (esp8266.available()) {
-          char c = esp8266.read();
-          Serial.println(c);
+        String params = response.substring(response.indexOf("="));
 
-          if (c == ' ') { break; }
+
+        for (int i = 1; i <= response.length(); i++) {
+          char c = params.charAt(i);
+
+          if (c == ' ') {
+            break;
+          }
 
           if (c == ',') {
             setBound(value, index++);
@@ -215,8 +215,24 @@ void loop() {
             value += c;
           }
         }
+        sendStatusJSON(connectionId, "ok");
+      } else if (response.indexOf("mode=") != -1) {
+        String params = response.substring(response.indexOf("="));
+        char c = params.charAt(1);
+
+        if (c >= '0' && c <= '9') {
+          int modeValue = c - '0';
+          if (modeValue >= 0 && modeValue <= 2) {
+            count = modeValue;
+            sendStatusJSON(connectionId, "ok");
+          } else {
+            sendStatusJSON(connectionId, "error");
+          }
+        } else {
+          sendStatusJSON(connectionId, "error");
+        }
       } else {
-        sendJSON(connectionId);
+        sendReadingJSON(connectionId);
       }
     }
   }
@@ -273,9 +289,14 @@ void setBound(String valueStr, int index) {
 
 void displayTemperature() {
   bool tempOutOfBounds = (temperature < tempLowerBound || temperature > tempUpperBound);
- 
-  if (isOn && (tempOutOfBounds)) {
-    playMelody();
+
+  if ((tempOutOfBounds)) {
+    digitalWrite(WARNING_LED, HIGH);
+    if (isOn) {
+      playMelody();
+    }
+  } else {
+    digitalWrite(WARNING_LED, LOW);
   }
   display.showNumberDec(temperature, NO_LEADING_ZEROS, SHOW_TWO_DIGITS, ALIGN_LEFT);
   display.setSegments(SEG_TEMP, SECOND_DIGIT, 2);
@@ -284,8 +305,13 @@ void displayTemperature() {
 void displayHumidity() {
   bool humidOutOfBounds = (humidity < humidLowerBound || humidity > humidUpperBound);
 
-  if (isOn && (humidOutOfBounds)) {
-    playMelody();
+  if ((humidOutOfBounds)) {
+    digitalWrite(WARNING_LED, HIGH);
+    if (isOn) {
+      playMelody();
+    }
+  } else {
+    digitalWrite(WARNING_LED, LOW);
   }
   display.showNumberDec(humidity, NO_LEADING_ZEROS, SHOW_TWO_DIGITS, ALIGN_LEFT);
   display.setSegments(SEG_HUMID, FIRST_DIGIT, 3);
@@ -344,7 +370,56 @@ String sendCommand(String command, const int timeout) {
   return response;
 }
 
-void sendJSON(int connectionId) {
+void sendStatusJSON(int connectionId, String status) {
+  digitalWrite(LED_BUILTIN, HIGH);
+
+  String json;
+  json.reserve(25);
+
+  json = "{\"status\":\"";
+  json += status;
+  json += "\"}";
+
+  String httpResponse;
+  httpResponse.reserve(150 + json.length());
+
+  httpResponse = "HTTP/1.1 200 OK\r\n";
+  httpResponse += "Access-Control-Allow-Origin: *\r\n";                                 // Allow all origins
+  httpResponse += "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS\r\n";  // Allow specific HTTP methods
+  httpResponse += "Access-Control-Allow-Headers: Content-Type\r\n";                     // Allow certain headers
+  httpResponse += "Connection: close\r\n";
+  httpResponse += "Content-Type: application/json\r\n";
+  httpResponse += "Content-Length: ";
+  httpResponse += String(json.length());
+  httpResponse += "\r\n\r\n";
+  httpResponse += json;
+
+  int contentLength = httpResponse.length();
+  String sendCmd = "AT+CIPSEND=";
+  sendCmd += String(connectionId);
+  sendCmd += ",";
+  sendCmd += String(contentLength);
+  sendCmd += "\r\n";
+
+  String closeCmd = "AT+CIPCLOSE=";
+  closeCmd += String(connectionId);
+  closeCmd += "\r\n";
+
+  String sendResult = sendCommand(sendCmd, 2000);
+  delay(500);
+
+  if (sendResult.indexOf(">") != 1) {
+    esp8266.println(httpResponse);
+    delay(2000);
+  }
+
+  sendCommand(closeCmd, 1000);
+  delay(500);
+
+  digitalWrite(LED_BUILTIN, LOW);
+}
+
+void sendReadingJSON(int connectionId) {
   digitalWrite(LED_BUILTIN, HIGH);
 
   String json;
@@ -376,7 +451,7 @@ void sendJSON(int connectionId) {
   httpResponse += "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS\r\n";  // Allow specific HTTP methods
   httpResponse += "Access-Control-Allow-Headers: Content-Type\r\n";                     // Allow certain headers
   httpResponse += "Connection: close\r\n";
-  httpResponse += "Content-Type: application/json\r\n";  // Your content type
+  httpResponse += "Content-Type: application/json\r\n";
   httpResponse += "Content-Length: ";
   httpResponse += String(json.length());
   httpResponse += "\r\n\r\n";
