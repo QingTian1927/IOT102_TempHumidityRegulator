@@ -5,6 +5,7 @@ import com.example.iotwebserver.repository.ReadingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -35,5 +36,17 @@ public class ReadingService {
         }
 
         return this.readingRepository.save(reading);
+    }
+
+    public List<Object[]> getHourlyAverages() {
+        return readingRepository.getHourlyAverages();
+    }
+
+    public List<Object[]> getDailyAveragesForWeek() {
+        return readingRepository.getDailyAveragesForWeek();
+    }
+
+    public List<Object[]> getWeeklyAveragesForMonth() {
+        return readingRepository.getWeeklyAveragesForMonth();
     }
 }
