@@ -15,6 +15,8 @@
             --light-green: #E1F2BD;
             --light-grey: #D1D9C1;
             --brown-green: #CBD9AD;
+            --red: #EF6461;
+            --blue: #7EBCE6;
         }
 
         .text-foreground {
@@ -75,7 +77,7 @@
         }
 
         body {
-            width: 100vw;
+            width: 100svw;
             min-height: 100svh;
             box-sizing: border-box;
 
@@ -347,6 +349,49 @@
         .graph-container {
             width: 100%;
             height: 100%;
+            margin-top: 1em;
+            display: flex;
+            box-sizing: border-box;
+            flex-direction: column;
+            gap: 2em;
+        }
+
+        .graph {
+            width: 100%;
+            min-height: 48em;
+            padding: 2em;
+            box-sizing: border-box;
+            border-radius: 0.75em;
+            background-color: var(--white);
+        }
+
+        .graph-buttons {
+            display: flex;
+            gap: 1em;
+        }
+
+        .graph-buttons > button {
+            border: none;
+            border-radius: 0.5em;
+            padding: 0.75em;
+            color: var(--black);
+            background-color: var(--white);
+            transition: transform 0.3s, background 0.3s;
+            cursor: pointer;
+        }
+
+        .graph-buttons > button:hover {
+            background-color: #e4e4e4;
+        }
+
+        .graph-buttons > .active {
+            color: var(--light-green);
+            background-color: var(--black);
+        }
+
+        .graph-buttons > .active:hover {
+            color: var(--light-green);
+            background-color: var(--black);
         }
     </style>
 
@@ -405,38 +450,64 @@
     </div>
 
     <div class="action-buttons">
+        <button type="button" id="interchange-btn" class="sans-serif">
+            <svg xmlns="http://www.w3.org/2000/svg" class="bi bi-shuffle"
+                 viewBox="0 0 16 16">
+                <path fill-rule="evenodd"
+                      d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.6 9.6 0 0 0 7.556 8a9.6 9.6 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.6 10.6 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.6 9.6 0 0 0 6.444 8a9.6 9.6 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5"/>
+                <path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192m0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192"/>
+            </svg>
+            Interchange
+        </button>
         <button type="button" id="temperature-btn" class="sans-serif">
             <svg xmlns="http://www.w3.org/2000/svg"
-                 class="bi bi-thermometer-low" viewBox="0 0 16 16">
-                <path d="M9.5 12.5a1.5 1.5 0 1 1-2-1.415V9.5a.5.5 0 0 1 1 0v1.585a1.5 1.5 0 0 1 1 1.415"/>
+                 class="bi bi-thermometer-half" viewBox="0 0 16 16">
+                <path d="M9.5 12.5a1.5 1.5 0 1 1-2-1.415V6.5a.5.5 0 0 1 1 0v4.585a1.5 1.5 0 0 1 1 1.415"/>
                 <path d="M5.5 2.5a2.5 2.5 0 0 1 5 0v7.55a3.5 3.5 0 1 1-5 0zM8 1a1.5 1.5 0 0 0-1.5 1.5v7.987l-.167.15a2.5 2.5 0 1 0 3.333 0l-.166-.15V2.5A1.5 1.5 0 0 0 8 1"/>
             </svg>
             Temperature
         </button>
-        <button type="button" id="refresh-btn" class="sans-serif">
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"/>
-                <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"/>
-            </svg>
-            Refresh
-        </button>
         <button type="button" id="humidity-btn" class="sans-serif">
-            <svg xmlns="http://www.w3.org/2000/svg" class="bi bi-moisture"
-                 viewBox="0 0 16 16">
-                <path d="M13.5 0a.5.5 0 0 0 0 1H15v2.75h-.5a.5.5 0 0 0 0 1h.5V7.5h-1.5a.5.5 0 0 0 0 1H15v2.75h-.5a.5.5 0 0 0 0 1h.5V15h-1.5a.5.5 0 0 0 0 1h2a.5.5 0 0 0 .5-.5V.5a.5.5 0 0 0-.5-.5zM7 1.5l.364-.343a.5.5 0 0 0-.728 0l-.002.002-.006.007-.022.023-.08.088a29 29 0 0 0-1.274 1.517c-.769.983-1.714 2.325-2.385 3.727C2.368 7.564 2 8.682 2 9.733 2 12.614 4.212 15 7 15s5-2.386 5-5.267c0-1.05-.368-2.169-.867-3.212-.671-1.402-1.616-2.744-2.385-3.727a29 29 0 0 0-1.354-1.605l-.022-.023-.006-.007-.002-.001zm0 0-.364-.343zm-.016.766L7 2.247l.016.019c.24.274.572.667.944 1.144.611.781 1.32 1.776 1.901 2.827H4.14c.58-1.051 1.29-2.046 1.9-2.827.373-.477.706-.87.945-1.144zM3 9.733c0-.755.244-1.612.638-2.496h6.724c.395.884.638 1.741.638 2.496C11 12.117 9.182 14 7 14s-4-1.883-4-4.267"/>
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="bi bi-droplet-half" viewBox="0 0 16 16">
+                <path fill-rule="evenodd"
+                      d="M7.21.8C7.69.295 8 0 8 0q.164.544.371 1.038c.812 1.946 2.073 3.35 3.197 4.6C12.878 7.096 14 8.345 14 10a6 6 0 0 1-12 0C2 6.668 5.58 2.517 7.21.8m.413 1.021A31 31 0 0 0 5.794 3.99c-.726.95-1.436 2.008-1.96 3.07C3.304 8.133 3 9.138 3 10c0 0 2.5 1.5 5 .5s5-.5 5-.5c0-1.201-.796-2.157-2.181-3.7l-.03-.032C9.75 5.11 8.5 3.72 7.623 1.82z"/>
+                <path fill-rule="evenodd"
+                      d="M4.553 7.776c.82-1.641 1.717-2.753 2.093-3.13l.708.708c-.29.29-1.128 1.311-1.907 2.87z"/>
             </svg>
             Humidity
         </button>
     </div>
 
-    <div class="graph-container sans-serif">
+    <div class="sans-serif">
         <header class="header">
             <h2 class="header-text">Graph</h2>
+
+            <div class="graph-buttons">
+                <button type="button" id="hourly-graph-button" class="active sans-serif">
+                    Hourly
+                </button>
+
+                <button type="button" id="daily-graph-button" class="sans-serif">
+                    Daily
+                </button>
+
+                <button type="button" id="weekly-graph-button" class="sans-serif">
+                    Weekly
+                </button>
+            </div>
         </header>
 
         <div class="graph-container">
-            <canvas id="graph-canvas"></canvas>
+            <div class="graph" id="hourly-graph">
+                <canvas id="hourlyChart"></canvas>
+            </div>
+            <div class="graph" id="daily-graph">
+                <canvas id="dailyChart"></canvas>
+            </div>
+            <div class="graph" id="weekly-graph">
+                <canvas id="weeklyChart"></canvas>
+            </div>
         </div>
     </div>
 </main>
@@ -494,10 +565,180 @@
     </form>
 </div>
 
-<th:block th:with="apiUrl = @{/api/upload}, espIP = ${settings.getEspIP()}">
+<th:block th:with="uploadUrl = @{/api/upload}, statisticsUrl = @{/api/statistics}, espIP = ${settings.getEspIP()}">
     <script th:inline="javascript">
         /*<![CDATA[*/
-        const espIP = [[${espIP}]];
+        let espIP = [[${espIP}]];
+
+        let hourlyChartObject = null;
+        let dailyChartObject = null;
+        let weeklyChartObject = null;
+
+        function addChartData(chart, label, newData) {
+            chart.data.labels.push(label);
+            chart.data.datasets.forEach((dataset) => {
+                dataset.data.push(newData);
+            });
+            chart.update();
+        }
+
+        function removeData(chart) {
+            chart.data.labels.pop();
+            chart.data.datasets.forEach((dataset) => {
+                dataset.data.pop();
+            });
+            chart.update();
+        }
+
+        function createChart(canvasId, labels, humidityData, temperatureData, labelPrefix) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: labelPrefix + ' Humidity (%)',
+                            data: humidityData,
+                            color: '#7eb801',
+                            borderColor: '#7eb801',
+                            backgroundColor: 'rgba(148, 163, 114, 0.2)',
+                            fill: true
+                        },
+                        {
+                            label: labelPrefix + ' Temperature (°C)',
+                            data: temperatureData,
+                            color: '#3a3a00',
+                            borderColor: '#3a3a00',
+                            backgroundColor: 'rgba(58, 58, 0, 0.2)',
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    scales: {
+                        y: {beginAtZero: true}
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                padding: 12
+                            },
+                            title: {
+                                padding: 12
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        async function fetchStatistics(type) {
+            const url = "" + [[${statisticsUrl}]] + `/${type}`;
+            try {
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        "Connection": "close"
+                    }
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    console.log(data);
+                    return data;
+                } else {
+                    console.error(`Fetch error: ${response}`);
+                    return [];
+                }
+            } catch (err) {
+                console.error("Fetch failed:", err);
+                return [];
+            }
+        }
+
+        let hourlyData = [];
+        let dailyData = [];
+        let weeklyData = [];
+
+        window.addEventListener("load", async () => {
+            hourlyData = await fetchStatistics("hourly");
+            dailyData = await fetchStatistics("daily");
+            weeklyData = await fetchStatistics("weekly");
+
+            const hourlyLabels = [], hourlyHumidity = [], hourlyTemperature = [];
+            const dailyLabels = [], dailyHumidity = [], dailyTemperature = [];
+            const weeklyLabels = [], weeklyHumidity = [], weeklyTemperature = [];
+
+            hourlyData.forEach(row => {
+                hourlyLabels.push(row[0] + ":00");
+                hourlyHumidity.push(row[1]);
+                hourlyTemperature.push(row[2]);
+            });
+
+            dailyData.forEach(row => {
+                dailyLabels.push(row[0]);
+                dailyHumidity.push(row[1]);
+                dailyTemperature.push(row[2]);
+            });
+
+            weeklyData.forEach(row => {
+                weeklyLabels.push(row[0]);
+                weeklyHumidity.push(row[1]);
+                weeklyTemperature.push(row[2]);
+            });
+
+            hourlyChartObject = createChart('hourlyChart', hourlyLabels, hourlyHumidity, hourlyTemperature, 'Hourly');
+            dailyChartObject = createChart('dailyChart', dailyLabels, dailyHumidity, dailyTemperature, 'Daily');
+            weeklyChartObject = createChart('weeklyChart', weeklyLabels, weeklyHumidity, weeklyTemperature, 'Weekly');
+        });
+
+        const hourlyGraph = document.getElementById("hourly-graph");
+        const dailyGraph = document.getElementById("daily-graph");
+        const weeklyGraph = document.getElementById("weekly-graph");
+
+        hourlyGraph.style.display = "block";
+        dailyGraph.style.display = "none";
+        weeklyGraph.style.display = "none";
+
+        const hourlyGraphButton = document.getElementById("hourly-graph-button");
+        const dailyGraphButton = document.getElementById("daily-graph-button");
+        const weeklyGraphButton = document.getElementById("weekly-graph-button");
+
+        document.getElementById("hourly-graph-button").addEventListener("click", () => {
+            if (!hourlyGraphButton.classList.contains("active")) {
+                hourlyGraphButton.classList.add("active");
+                dailyGraphButton.classList.remove("active");
+                weeklyGraphButton.classList.remove("active");
+                hourlyGraph.style.display = "block";
+                dailyGraph.style.display = "none";
+                weeklyGraph.style.display = "none";
+            }
+        });
+
+        document.getElementById("daily-graph-button").addEventListener("click", () => {
+            if (!dailyGraphButton.classList.contains("active")) {
+                hourlyGraphButton.classList.remove("active");
+                dailyGraphButton.classList.add("active");
+                weeklyGraphButton.classList.remove("active");
+                hourlyGraph.style.display = "none";
+                dailyGraph.style.display = "block";
+                weeklyGraph.style.display = "none";
+            }
+        });
+
+        document.getElementById("weekly-graph-button").addEventListener("click", () => {
+            if (!weeklyGraph.classList.contains("active")) {
+                hourlyGraphButton.classList.remove("active");
+                dailyGraphButton.classList.remove("active");
+                weeklyGraphButton.classList.add("active");
+                hourlyGraph.style.display = "none";
+                dailyGraph.style.display = "none";
+                weeklyGraph.style.display = "block";
+            }
+        });
 
         function openOverlay(overlay) {
             overlay.style.display = "flex";
@@ -573,6 +814,13 @@
             e.preventDefault();
             const settingsForm = document.getElementById("settings-form");
 
+            const espIpInput = document.getElementById("espIp");
+            if (espIpInput.value === "") {
+                alert("ESP8266-01 IP Address cannot be empty");
+                return;
+            }
+            espIP = espIpInput.value;
+
             if (temperatureUpperBound.value < temperatureLowerBound.value) {
                 alert("Temperature upper bound cannot be smaller than lower bound");
                 return;
@@ -633,7 +881,7 @@
         syncClock();
 
         async function postReading(data) {
-            const postUrl = [[${apiUrl}]];
+            const postUrl = [[${uploadUrl}]];
 
             try {
                 const response = await fetch(postUrl, {
@@ -682,8 +930,49 @@
                     temperatureText.innerText = `${data.temperature}°C`;
                     humidity.innerText = `${data.humidity} %`;
 
+                    if (data.temperature < temperatureLowerBound.value || data.temperature > temperatureUpperBound.value) {
+                        turnOnWarning(temperatureWarning);
+                    }
+                    if (data.humidity < humidityLowerBound.value || data.humidity > humidityUpperBound.value) {
+                        turnOnWarning(temperatureWarning);
+                    }
+
                     if (data.status === "ok") {
                         await postReading(data);
+
+                        hourlyData = await fetchStatistics("hourly");
+                        dailyData = await fetchStatistics("daily");
+                        weeklyData = await fetchStatistics("weekly");
+
+                        const hourlyLabels = [], hourlyHumidity = [], hourlyTemperature = [];
+                        const dailyLabels = [], dailyHumidity = [], dailyTemperature = [];
+                        const weeklyLabels = [], weeklyHumidity = [], weeklyTemperature = [];
+
+                        hourlyData.forEach(row => {
+                            hourlyLabels.push(row[0] + ":00");
+                            hourlyHumidity.push(row[1]);
+                            hourlyTemperature.push(row[2]);
+                        });
+
+                        dailyData.forEach(row => {
+                            dailyLabels.push(row[0]);
+                            dailyHumidity.push(row[1]);
+                            dailyTemperature.push(row[2]);
+                        });
+
+                        weeklyData.forEach(row => {
+                            weeklyLabels.push(row[0]);
+                            weeklyHumidity.push(row[1]);
+                            weeklyTemperature.push(row[2]);
+                        });
+
+                        hourlyChartObject.destroy();
+                        dailyChartObject.destroy();
+                        weeklyChartObject.destroy();
+
+                        hourlyChartObject = createChart('hourlyChart', hourlyLabels, hourlyHumidity, hourlyTemperature, 'Hourly');
+                        dailyChartObject = createChart('dailyChart', dailyLabels, dailyHumidity, dailyTemperature, 'Daily');
+                        weeklyChartObject = createChart('weeklyChart', weeklyLabels, weeklyHumidity, weeklyTemperature, 'Weekly');
                     }
 
                     return data;
@@ -740,6 +1029,50 @@
                 blinkWarning(document.getElementById("humidity-warning"))
             }, 500);
             alert("ESP8266-01 IP Address has not been set up yet!");
+        });
+
+        const MODE_INTERCHANGE = 0;
+        const MODE_TEMPERATURE = 1;
+        const MODE_HUMIDITY = 2;
+
+        async function switchArduinoMode(mode) {
+            const url = `http://${espIP}:80/?mode=${mode}`;
+            try {
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        "Connection": "close"
+                    }
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    console.log(data);
+                    return data;
+                } else {
+                    console.error(`Fetch error: ${response}`);
+                    return null;
+                }
+            } catch (err) {
+                console.error("Fetch failed:", err);
+                return null;
+            }
+        }
+
+        const interchangeButton = document.getElementById("interchange-btn");
+        const temperatureButton = document.getElementById("temperature-btn");
+        const humidityButton = document.getElementById("humidity-btn");
+
+        interchangeButton.addEventListener("click", async () => {
+            await switchArduinoMode(MODE_INTERCHANGE);
+        });
+
+        temperatureButton.addEventListener("click", async () => {
+            await switchArduinoMode(MODE_TEMPERATURE);
+        });
+
+        humidityButton.addEventListener("click", async () => {
+            await switchArduinoMode(MODE_HUMIDITY);
         });
 
         /*
