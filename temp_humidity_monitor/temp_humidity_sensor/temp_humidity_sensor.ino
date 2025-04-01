@@ -196,16 +196,13 @@ void loop() {
         String value = "";
 
         String params = response.substring(response.indexOf("="));
-
+        Serial.println(params);
 
         for (int i = 1; i <= response.length(); i++) {
           char c = params.charAt(i);
+          Serial.println(value);
 
-          if (c == ' ') {
-            break;
-          }
-
-          if (c == ',') {
+          if (c == ','  || c == ' ') {
             setBound(value, index++);
             value = "";
             continue;
@@ -215,6 +212,15 @@ void loop() {
             value += c;
           }
         }
+
+        Serial.print(tempLowerBound);
+        Serial.print(" ");
+        Serial.print(tempUpperBound);
+        Serial.print(" - ");
+        Serial.print(humidLowerBound);
+        Serial.print(" ");
+        Serial.println(humidUpperBound);
+
         sendStatusJSON(connectionId, "ok");
       } else if (response.indexOf("mode=") != -1) {
         String params = response.substring(response.indexOf("="));
@@ -254,34 +260,42 @@ void getBound() {
   humidLowerBound = EEPROM.read(EEPROM_HUMD_LOWER);
   if (humidLowerBound == 255) {
     humidLowerBound = HUMD_HARD_LOWER_BOUND;
-    EEPROM.write(EEPROM_HUMD_LOWER, HUMD_HARD_LOWER_BOUND);
+    EEPROM.write(EEPROM_HUMD_LOWER, humidLowerBound);
   }
 
   humidUpperBound = EEPROM.read(EEPROM_HUMD_UPPER);
   if (humidUpperBound == 255) {
     humidUpperBound = HUMD_HARD_UPPER_BOUND;
-    EEPROM.write(EEPROM_HUMD_UPPER, HUMD_HARD_UPPER_BOUND);
+    EEPROM.write(EEPROM_HUMD_UPPER, humidUpperBound);
   }
 }
 
 void setBound(String valueStr, int index) {
   int valueNum = valueStr.toInt();
 
+  Serial.print(valueNum);
+  Serial.print(" - ");
+  Serial.println(index);
+
   switch (index) {
     case EEPROM_TEMP_LOWER:
       tempLowerBound = valueNum;
+      Serial.println(tempLowerBound);
       EEPROM.write(EEPROM_TEMP_LOWER, tempLowerBound);
       return;
     case EEPROM_TEMP_UPPER:
       tempUpperBound = valueNum;
+      Serial.println(tempUpperBound);
       EEPROM.write(EEPROM_TEMP_UPPER, tempUpperBound);
       return;
-    case 2:
+    case EEPROM_HUMD_LOWER:
       humidLowerBound = valueNum;
+      Serial.println(humidLowerBound);
       EEPROM.write(EEPROM_HUMD_LOWER, humidLowerBound);
       return;
-    case 3:
+    case EEPROM_HUMD_UPPER:
       humidUpperBound = valueNum;
+      Serial.println(humidUpperBound);
       EEPROM.write(EEPROM_HUMD_UPPER, humidUpperBound);
       return;
   }

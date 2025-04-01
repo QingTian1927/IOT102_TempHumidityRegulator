@@ -803,6 +803,7 @@
 
             let url = `http://${espIP}:80/?bounds=${params.join(",")}`;
             console.log(url);
+
             try {
                 const response = await fetch(url, {
                     method: "GET",
